@@ -1,0 +1,42 @@
+/* Design CSS Export from Figma - CRAPPO Cryptocurrency Website */
+
+/* MAIN COLORS */
+--color-primary: #0D0D2B;
+--color-accent: #3671E9;
+--color-secondary: #2B076E;
+--color-white: #FFFFFF;
+--color-grey-5: #E0E0E0;
+--color-grey-4: #BDBDBD;
+--color-grey-3: #828282;
+--color-grey-6: #F2F2F2;
+--color-green: #8FFFBE;
+--color-green-dark: #6EDCB5;
+--color-red: #FF7676;
+--color-red-dark: #FF325F;
+--color-cyan: #42FFFF;
+
+/* FONTS */
+--font-rubik: 'Rubik';
+--font-inter: 'Inter';
+
+/* STRUCTURE */
+/* Header (0px - 850px) - Navigation, Hero section */
+/* Numbers (100px - 192px) - Stats section ($30B, 10M+, 195 countries) */
+/* Features (3205px - 5079px) - Charts, crypto table */
+/* Start Mining (5079px - 5471px) - Subscribe form */
+/* Footer (5471px - 6023px) - Links, socials, payment systems */
+
+/* COMPONENTS IDENTIFIED */
+1. Navigation: Logo, Menu (Products, Features, About, Contact), Login/Register buttons
+2. Hero: Title, subtitle, CTA button, Bitcoin illustration, Info badge
+3. Stats: 3 cards with icons and numbers
+4. Charts: TradingView-style charts with Buy/Sell buttons
+5. Crypto Table: BTC, ETH, LTC with price, change, volume
+6. Subscribe Form: Email input + Subscribe button
+7. Footer: Logo, links, social icons, payment systems
+
+/* BUTTON STYLES */
+- Primary button: background #3671E9, border-radius 32px, white text
+- Secondary button: background #FFFFFF, border-radius 32px, dark text
+- Buy button: background #6EDCB5
+- Sell button: background #FF325F
