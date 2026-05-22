@@ -15,17 +15,50 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  const getUsers = () => {
+    const users = localStorage.getItem('users');
+    return users ? JSON.parse(users) : [];
+  };
+
+  const saveUsers = (users) => {
+    localStorage.setItem('users', JSON.stringify(users));
+  };
+
   const login = (email, password) => {
-    // Simple mock authentication
-    const userData = { email, name: email.split('@')[0] };
+    const users = getUsers();
+    const foundUser = users.find(u => u.email === email && u.password === password);
+    
+    if (!foundUser) {
+      throw new Error('Invalid email or password');
+    }
+
+    const userData = { email, name: foundUser.name };
     setUser(userData);
     setIsAuthenticated(true);
     localStorage.setItem('user', JSON.stringify(userData));
   };
 
   const register = (email, password) => {
-    // Simple mock registration
-    const userData = { email, name: email.split('@')[0] };
+    const users = getUsers();
+    
+    // Check if email already exists
+    if (users.find(u => u.email === email)) {
+      throw new Error('Email already registered');
+    }
+
+    // Create new user
+    const newUser = {
+      id: Date.now(),
+      email,
+      password,
+      name: email.split('@')[0],
+      createdAt: new Date().toISOString()
+    };
+
+    users.push(newUser);
+    saveUsers(users);
+
+    const userData = { email, name: newUser.name };
     setUser(userData);
     setIsAuthenticated(true);
     localStorage.setItem('user', JSON.stringify(userData));

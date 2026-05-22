@@ -5,17 +5,28 @@ import Footer from '../components/common/Footer';
 import Button from '../components/common/Button';
 import { useAuth } from '../context/AuthContext';
 import { useCrypto } from '../context/CryptoContext';
-import { LogOut, Settings, User, Heart } from 'lucide-react';
+import { LogOut, Settings, User, Heart, Trash2 } from 'lucide-react';
 
 const Profile = () => {
   const { user, isAuthenticated, logout } = useAuth();
-  const { favorites } = useCrypto();
+  const { favorites, cryptos, toggleFavorite } = useCrypto();
   const navigate = useNavigate();
 
   if (!isAuthenticated) {
     navigate('/login');
     return null;
   }
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(price);
+  };
+
+  const favoriteCryptos = cryptos.filter(crypto => favorites.includes(crypto.id));
 
   const handleLogout = () => {
     logout();
@@ -62,13 +73,35 @@ const Profile = () => {
             <h2 className="text-white text-2xl font-bold">Favorite Cryptocurrencies</h2>
           </div>
           
-          {favorites.length === 0 ? (
+          {favoriteCryptos.length === 0 ? (
             <p className="text-grey-5 text-base">You haven't added any favorites yet.</p>
           ) : (
             <div className="space-y-4">
-              {favorites.map((cryptoId) => (
-                <div key={cryptoId} className="p-4 bg-white/5 rounded-xl">
-                  <p className="text-white font-bold">{cryptoId}</p>
+              {favoriteCryptos.map((crypto) => (
+                <div key={crypto.id} className="flex justify-between items-center p-4 bg-white/5 rounded-xl">
+                  <div className="flex items-center gap-4">
+                    <img src={crypto.image} alt={crypto.name} className="w-10 h-10" />
+                    <div>
+                      <p className="text-white font-bold">{crypto.symbol.toUpperCase()}</p>
+                      <p className="text-grey-5 text-sm">{crypto.name}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <p className="text-white font-bold">{formatPrice(crypto.current_price)}</p>
+                      <p className={`${
+                        crypto.price_change_percentage_24h >= 0 ? 'text-green' : 'text-red'
+                      } text-sm`}>
+                        {crypto.price_change_percentage_24h >= 0 ? '+' : ''}{crypto.price_change_percentage_24h?.toFixed(2)}%
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => toggleFavorite(crypto.id)}
+                      className="p-2 rounded-full hover:bg-red/20 transition-colors"
+                    >
+                      <Trash2 className="w-5 h-5 text-red" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

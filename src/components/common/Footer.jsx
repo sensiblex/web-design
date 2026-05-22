@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bitcoin, Facebook, Instagram, Youtube, Twitter, Linkedin } from 'lucide-react';
+import { Bitcoin } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -67,21 +67,9 @@ const Footer = () => {
 
       {/* Social Icons */}
       <div className="flex gap-6 mt-[366px]">
-        <a href="#" className="w-6 h-6 flex items-center justify-center text-white hover:text-accent transition-colors">
-          <Facebook className="w-6 h-6" />
-        </a>
-        <a href="#" className="w-6 h-6 flex items-center justify-center text-white hover:text-accent transition-colors">
-          <Instagram className="w-6 h-6" />
-        </a>
-        <a href="#" className="w-6 h-6 flex items-center justify-center text-white hover:text-accent transition-colors">
-          <Youtube className="w-6 h-6" />
-        </a>
-        <a href="#" className="w-6 h-6 flex items-center justify-center text-white hover:text-accent transition-colors">
-          <Twitter className="w-6 h-6" />
-        </a>
-        <a href="#" className="w-6 h-6 flex items-center justify-center text-white hover:text-accent transition-colors">
-          <Linkedin className="w-6 h-6" />
-        </a>
+        <a href="#" className="text-white hover:text-accent transition-colors">Facebook</a>
+        <a href="#" className="text-white hover:text-accent transition-colors">Instagram</a>
+        <a href="#" className="text-white hover:text-accent transition-colors">LinkedIn</a>
       </div>
     </footer>
   );

@@ -5,6 +5,9 @@ import Wallet from './pages/Wallet';
 import Profile from './pages/Profile';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Features from './pages/Features';
+import About from './pages/About';
+import Contact from './pages/Contact';
 
 function App() {
   return (
@@ -16,6 +19,9 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/features" element={<Features />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
       </Routes>
     </Router>
   );

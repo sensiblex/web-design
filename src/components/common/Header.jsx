@@ -18,7 +18,7 @@ const Header = () => {
       {/* Navigation */}
       <nav className="flex items-center gap-8">
         <Link to="/market" className="text-white text-base font-normal hover:text-accent transition-colors">
-          Products
+          Market
         </Link>
         <Link to="/features" className="text-white text-base font-normal hover:text-accent transition-colors">
           Features
