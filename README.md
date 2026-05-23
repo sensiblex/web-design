@@ -1,16 +1,58 @@
-# React + Vite
+# CryptoPlatform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Учебный проект на React для отслеживания криптовалют, базового управления портфелем и имитации операций покупки/продажи.
 
-Currently, two official plugins are available:
+## Что реализовано
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Авторизация и регистрация с валидацией полей
+- Защищённые маршруты для авторизованных пользователей
+- Просмотр рынка криптовалют (данные из CoinGecko API)
+- Поиск, сортировка и избранное
+- Покупка/продажа активов и история транзакций
+- Профиль пользователя
 
-## React Compiler
+## Технологии
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React
+- React Router DOM
+- Tailwind CSS
+- Vite
+- Lucide React
 
-## Expanding the ESLint configuration
+## Структура
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```text
+src/
+├── components/common/   # UI-компоненты
+├── context/             # Контексты приложения
+├── pages/               # Страницы
+├── utils/               # Валидация и форматирование
+├── App.jsx
+└── main.jsx
+```
+
+## Установка и запуск
+
+Требования: Node.js 18+.
+
+```bash
+git clone <URL-репозитория>
+cd web-design
+npm install
+npm run dev
+```
+
+Дополнительно:
+
+```bash
+npm run build
+npm run preview
+```
+
+## API
+
+Используется CoinGecko API для получения цен, рыночной капитализации и изменения стоимости за 24 часа.
+
+## Примечание
+
+Проект выполнен в учебных целях.

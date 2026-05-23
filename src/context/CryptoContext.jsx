@@ -12,13 +12,11 @@ export const CryptoProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    // Load favorites from localStorage
     const savedFavorites = localStorage.getItem('favorites');
     if (savedFavorites) {
       setFavorites(JSON.parse(savedFavorites));
     }
 
-    // Load wallet from localStorage
     const savedWallet = localStorage.getItem('wallet');
     if (savedWallet) {
       setWallet(JSON.parse(savedWallet));
@@ -118,6 +116,7 @@ export const CryptoProvider = ({ children }) => {
       favorites, 
       toggleFavorite, 
       wallet, 
+      setWallet,
       buyCrypto, 
       sellCrypto 
     }}>

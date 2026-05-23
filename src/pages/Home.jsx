@@ -5,13 +5,13 @@ import Footer from '../components/common/Footer';
 import Button from '../components/common/Button';
 import { Bitcoin, TrendingUp, Users, Globe, ArrowRight, Heart } from 'lucide-react';
 import { useCrypto } from '../context/CryptoContext';
+import { formatPrice, formatVolume } from '../utils/formatters';
 
 const Home = () => {
   const { cryptos, setCryptos, favorites, toggleFavorite } = useCrypto();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch crypto data
     const fetchCryptos = async () => {
       try {
         const response = await fetch(
@@ -20,7 +20,7 @@ const Home = () => {
         const data = await response.json();
         setCryptos(data);
       } catch (error) {
-        console.error('Error fetching cryptos:', error);
+        console.error('Ошибка валют:', error);
       } finally {
         setLoading(false);
       }
@@ -29,29 +29,11 @@ const Home = () => {
     fetchCryptos();
   }, [setCryptos]);
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(price);
-  };
-
-  const formatVolume = (volume) => {
-    if (volume >= 1e9) {
-      return `$${(volume / 1e9).toFixed(2)}B`;
-    } else if (volume >= 1e6) {
-      return `$${(volume / 1e6).toFixed(2)}M`;
-    }
-    return formatPrice(volume);
-  };
 
   return (
     <div className="min-h-screen bg-primary">
       <Header />
       
-      {/* Hero Section */}
       <section className="w-full px-[120px] py-[163px]">
         <div className="flex justify-between items-center">
           <div className="w-[588px]">
@@ -60,20 +42,20 @@ const Home = () => {
                 75% SAVE
               </div>
               <span className="text-white text-base font-normal">
-                For the Black Friday weekend
+                Для выходных в Чёрную пятницу
               </span>
             </div>
             
             <h1 className="text-[64px] font-bold leading-[76px] text-white mb-[64px]">
-              Fastest & secure platform to invest in crypto
+              Самая быстрая и безопасная платформа для инвестиций в криптовалюту
             </h1>
             
             <p className="text-grey-5 text-base leading-7 mb-[88px]">
-              Buy and sell cryptocurrencies, trusted by 10M wallets with over $30 billion in transactions.
+              Покупайте и продавайте криптовалюты, которым доверяют 10M кошельков с транзакциями на сумму более $30 миллиардов.
             </p>
             
             <Button className="flex items-center gap-6">
-              Try for FREE
+              Попробовать БЕСПЛАТНО
               <ArrowRight className="w-8 h-8" />
             </Button>
           </div>
@@ -84,7 +66,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
       <section className="w-full px-[120px] py-[100px]">
         <div className="flex justify-between gap-[109px]">
           <div className="flex items-center gap-6">
@@ -93,7 +74,7 @@ const Home = () => {
             </div>
             <div>
               <p className="text-[40px] font-bold leading-[60px] text-white">$30B</p>
-              <p className="text-grey-5 text-base leading-7">Digital Currency Exchanged</p>
+              <p className="text-grey-5 text-base leading-7">Обменено цифровой валюты</p>
             </div>
           </div>
           
@@ -103,7 +84,7 @@ const Home = () => {
             </div>
             <div>
               <p className="text-[40px] font-bold leading-[60px] text-white">10M+</p>
-              <p className="text-grey-5 text-base leading-7">Trusted Wallets Investor</p>
+              <p className="text-grey-5 text-base leading-7">Доверенных инвесторов кошельков</p>
             </div>
           </div>
           
@@ -113,23 +94,22 @@ const Home = () => {
             </div>
             <div>
               <p className="text-[40px] font-bold leading-[60px] text-white">195</p>
-              <p className="text-grey-5 text-base leading-7">Countries Supported</p>
+              <p className="text-grey-5 text-base leading-7">Поддерживаемых стран</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Crypto Table Section */}
       <section className="w-full px-[120px] py-[144px] bg-secondary">
         <div className="flex justify-between items-start mb-[296px]">
           <div className="w-[454px]">
             <h2 className="text-[32px] font-bold leading-[48px] text-white mb-[120px]">
-              Grow your profit and track your investments
+              Увеличивайте свою прибыль и отслеживайте инвестиции
             </h2>
             <p className="text-grey-5 text-base leading-7 mb-[116px]">
-              Use advanced analytical tools. Clear TradingView charts let you track current and historical profit investments.
+              Используйте расширенные аналитические инструменты. Чёткие графики TradingView позволяют отслеживать текущие и исторические прибыли инвестиций.
             </p>
-            <Button variant="secondary">Learn More</Button>
+            <Button variant="secondary">Узнать больше</Button>
           </div>
           
           <div className="w-[610px]">
@@ -137,17 +117,17 @@ const Home = () => {
               <table className="w-full">
                 <thead>
                   <tr className="text-white text-sm font-semibold">
-                    <th className="text-left pb-6">Name</th>
-                    <th className="text-left pb-6">Price</th>
-                    <th className="text-left pb-6">Change</th>
-                    <th className="text-left pb-6">Volume (24h)</th>
+                    <th className="text-left pb-6">Название</th>
+                    <th className="text-left pb-6">Цена</th>
+                    <th className="text-left pb-6">Изменение</th>
+                    <th className="text-left pb-6">Объём (24ч)</th>
                   </tr>
                 </thead>
                 <tbody>
                   {loading ? (
                     <tr>
                       <td colSpan="4" className="text-center py-8 text-white">
-                        Loading...
+                        Загрузка...
                       </td>
                     </tr>
                   ) : (
@@ -188,25 +168,24 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Subscribe Section */}
       <section className="w-full px-[120px] py-[88px] bg-gradient-to-b from-[#2B076E] to-primary">
         <div className="bg-accent rounded-2xl p-[88px] flex items-center justify-between">
           <div className="w-[501px]">
             <h2 className="text-[32px] font-bold leading-[48px] text-white mb-[64px]">
-              Start mining now
+              Начните майнинг сейчас
             </h2>
             <p className="text-white text-base leading-7">
-              Join now with CRAPPO to get the latest news and start mining now
+              Присоединяйтесь к CRAPPO сейчас, чтобы получать последние новости и начать майнинг
             </p>
           </div>
           
           <div className="flex items-center gap-4">
             <input
               type="email"
-              placeholder="Enter your email"
+              placeholder="Введите ваш email"
               className="w-[374px] h-[55px] bg-transparent border border-white/40 rounded-32 px-6 text-white placeholder:text-white"
             />
-            <Button variant="secondary">Subscribe</Button>
+            <Button variant="secondary">Подписаться</Button>
           </div>
         </div>
       </section>

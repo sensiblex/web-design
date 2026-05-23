@@ -7,7 +7,6 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check for saved user in localStorage
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
@@ -29,7 +28,7 @@ export const AuthProvider = ({ children }) => {
     const foundUser = users.find(u => u.email === email && u.password === password);
     
     if (!foundUser) {
-      throw new Error('Invalid email or password');
+      throw new Error('Неправильный логин или пароль');
     }
 
     const userData = { email, name: foundUser.name };
@@ -41,12 +40,10 @@ export const AuthProvider = ({ children }) => {
   const register = (email, password) => {
     const users = getUsers();
     
-    // Check if email already exists
     if (users.find(u => u.email === email)) {
-      throw new Error('Email already registered');
+      throw new Error('Email Уже есть');
     }
 
-    // Create new user
     const newUser = {
       id: Date.now(),
       email,
@@ -57,6 +54,13 @@ export const AuthProvider = ({ children }) => {
 
     users.push(newUser);
     saveUsers(users);
+
+    const initialWallet = {
+      balance: 10000,
+      assets: [],
+      transactions: []
+    };
+    localStorage.setItem('wallet', JSON.stringify(initialWallet));
 
     const userData = { email, name: newUser.name };
     setUser(userData);
@@ -80,7 +84,7 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('ERROR');
   }
   return context;
 };

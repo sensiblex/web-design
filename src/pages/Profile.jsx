@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
 import Button from '../components/common/Button';
+import Input from '../components/common/Input';
 import { useAuth } from '../context/AuthContext';
 import { useCrypto } from '../context/CryptoContext';
 import { LogOut, Settings, User, Heart, Trash2 } from 'lucide-react';
+import { formatPrice, formatPercentage } from '../utils/formatters';
 
 const Profile = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -17,14 +19,6 @@ const Profile = () => {
     return null;
   }
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(price);
-  };
 
   const favoriteCryptos = cryptos.filter(crypto => favorites.includes(crypto.id));
 
@@ -39,7 +33,7 @@ const Profile = () => {
       
       <section className="w-full px-[120px] py-[80px]">
         <h1 className="text-[48px] font-bold leading-[72px] text-white mb-[60px]">
-          My Profile
+          Мой профиль
         </h1>
 
         {/* User Info Card */}
@@ -49,7 +43,7 @@ const Profile = () => {
               <User className="w-10 h-10 text-accent" />
             </div>
             <div>
-              <h2 className="text-white text-2xl font-bold mb-2">{user?.name || 'User'}</h2>
+              <h2 className="text-white text-2xl font-bold mb-2">{user?.name || 'Пользователь'}</h2>
               <p className="text-grey-5 text-base">{user?.email || 'user@example.com'}</p>
             </div>
           </div>
@@ -57,11 +51,11 @@ const Profile = () => {
           <div className="flex gap-4">
             <Button variant="secondary" className="flex items-center gap-2">
               <Settings className="w-5 h-5" />
-              Edit Profile
+              Редактировать профиль
             </Button>
             <Button variant="red" className="flex items-center gap-2" onClick={handleLogout}>
               <LogOut className="w-5 h-5" />
-              Logout
+              Выйти
             </Button>
           </div>
         </div>
@@ -70,11 +64,11 @@ const Profile = () => {
         <div className="bg-secondary rounded-2xl p-8 mb-8">
           <div className="flex items-center gap-2 mb-6">
             <Heart className="w-6 h-6 text-red" />
-            <h2 className="text-white text-2xl font-bold">Favorite Cryptocurrencies</h2>
+            <h2 className="text-white text-2xl font-bold">Избранные криптовалюты</h2>
           </div>
           
           {favoriteCryptos.length === 0 ? (
-            <p className="text-grey-5 text-base">You haven't added any favorites yet.</p>
+            <p className="text-grey-5 text-base">Вы ещё не добавили избранные криптовалюты.</p>
           ) : (
             <div className="space-y-4">
               {favoriteCryptos.map((crypto) => (
@@ -92,7 +86,7 @@ const Profile = () => {
                       <p className={`${
                         crypto.price_change_percentage_24h >= 0 ? 'text-green' : 'text-red'
                       } text-sm`}>
-                        {crypto.price_change_percentage_24h >= 0 ? '+' : ''}{crypto.price_change_percentage_24h?.toFixed(2)}%
+                        {formatPercentage(crypto.price_change_percentage_24h)}
                       </p>
                     </div>
                     <button
@@ -110,30 +104,24 @@ const Profile = () => {
 
         {/* Account Settings */}
         <div className="bg-secondary rounded-2xl p-8">
-          <h2 className="text-white text-2xl font-bold mb-6">Account Settings</h2>
+          <h2 className="text-white text-2xl font-bold mb-6">Настройки аккаунта</h2>
           
           <div className="space-y-6">
-            <div>
-              <label className="block text-grey-5 text-sm mb-2">Email</label>
-              <input
-                type="email"
-                value={user?.email || ''}
-                readOnly
-                className="w-full h-[55px] bg-white/10 border border-white/20 rounded-32 px-6 text-white"
-              />
-            </div>
+            <Input
+              type="email"
+              label="Email"
+              value={user?.email || ''}
+              readOnly
+            />
             
-            <div>
-              <label className="block text-grey-5 text-sm mb-2">Username</label>
-              <input
-                type="text"
-                value={user?.name || ''}
-                readOnly
-                className="w-full h-[55px] bg-white/10 border border-white/20 rounded-32 px-6 text-white"
-              />
-            </div>
+            <Input
+              type="text"
+              label="Имя пользователя"
+              value={user?.name || ''}
+              readOnly
+            />
 
-            <Button variant="primary">Save Changes</Button>
+            <Button variant="primary">Сохранить изменения</Button>
           </div>
         </div>
       </section>

@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
 import Button from '../components/common/Button';
+import Input from '../components/common/Input';
 import { useCrypto } from '../context/CryptoContext';
 import { useAuth } from '../context/AuthContext';
 import { ArrowUpRight, ArrowDownRight, TrendingUp, X } from 'lucide-react';
+import { formatPrice } from '../utils/formatters';
 
 const Wallet = () => {
-  const { wallet, cryptos, buyCrypto, sellCrypto, setWallet } = useCrypto();
+  const { wallet, cryptos, buyCrypto, sellCrypto, setWallet, setCryptos } = useCrypto();
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [showBuyModal, setShowBuyModal] = useState(false);
@@ -18,19 +20,34 @@ const Wallet = () => {
   const [amount, setAmount] = useState('');
   const [depositAmount, setDepositAmount] = useState('');
 
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    const fetchCryptos = async () => {
+      try {
+        const response = await fetch(
+          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h'
+        );
+        const data = await response.json();
+        setCryptos(data);
+      } catch (error) {
+        console.error('Error fetching cryptos:', error);
+      }
+    };
+
+    if (cryptos.length === 0) {
+      fetchCryptos();
+    }
+  }, [cryptos.length, setCryptos]);
+
   if (!isAuthenticated) {
-    navigate('/login');
     return null;
   }
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(price);
-  };
 
   const totalPortfolioValue = wallet.assets.reduce(
     (total, asset) => {
@@ -90,14 +107,13 @@ const Wallet = () => {
       
       <section className="w-full px-[120px] py-[80px]">
         <h1 className="text-[48px] font-bold leading-[72px] text-white mb-[60px]">
-          My Wallet
+          Мой кошелёк
         </h1>
 
-        {/* Balance Card */}
         <div className="bg-secondary rounded-2xl p-8 mb-8">
           <div className="flex justify-between items-start mb-8">
             <div>
-              <p className="text-grey-5 text-base mb-2">Total Balance</p>
+              <p className="text-grey-5 text-base mb-2">Общий баланс</p>
               <p className="text-white text-[48px] font-bold leading-[72px]">
                 {formatPrice(wallet.balance + totalPortfolioValue)}
               </p>
@@ -105,7 +121,7 @@ const Wallet = () => {
             <div className="flex gap-4">
               <Button variant="green" className="flex items-center gap-2" onClick={() => setShowDepositModal(true)}>
                 <ArrowUpRight className="w-5 h-5" />
-                Deposit
+                Депозит
               </Button>
             </div>
           </div>
@@ -114,21 +130,20 @@ const Wallet = () => {
             <div className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-green" />
               <span className="text-green text-base font-medium">
-                +12.5% this month
+                +12.5% в этом месяце
               </span>
             </div>
             <p className="text-grey-4 text-sm">
-              USD Balance: {formatPrice(wallet.balance)}
+              Баланс USD: {formatPrice(wallet.balance)}
             </p>
           </div>
         </div>
 
-        {/* Assets */}
         <div className="bg-secondary rounded-2xl p-8 mb-8">
-          <h2 className="text-white text-2xl font-bold mb-6">My Assets</h2>
+          <h2 className="text-white text-2xl font-bold mb-6">Мои активы</h2>
           
           {wallet.assets.length === 0 ? (
-            <p className="text-grey-5 text-base">You don't have any assets yet.</p>
+            <p className="text-grey-5 text-base">У вас пока нет активов.</p>
           ) : (
             <div className="space-y-4">
               {wallet.assets.map((asset) => {
@@ -149,7 +164,7 @@ const Wallet = () => {
                     <div className="flex items-center gap-4">
                       <div className="text-right">
                         <p className="text-white font-bold">{formatPrice(currentValue)}</p>
-                        <p className="text-grey-5 text-sm">{formatPrice(currentPrice)} per unit</p>
+                        <p className="text-grey-5 text-sm">{formatPrice(currentPrice)} за единицу</p>
                       </div>
                       <div className="flex gap-2">
                         <Button 
@@ -157,14 +172,14 @@ const Wallet = () => {
                           className="px-3 py-2 text-sm"
                           onClick={() => handleBuyClick(currentCrypto)}
                         >
-                          Buy
+                          Купить
                         </Button>
                         <Button 
                           variant="red" 
                           className="px-3 py-2 text-sm"
                           onClick={() => handleSellClick(currentCrypto)}
                         >
-                          Sell
+                          Продать
                         </Button>
                       </div>
                     </div>
@@ -175,12 +190,11 @@ const Wallet = () => {
           )}
         </div>
 
-        {/* Transaction History */}
         <div className="bg-secondary rounded-2xl p-8">
-          <h2 className="text-white text-2xl font-bold mb-6">Transaction History</h2>
+          <h2 className="text-white text-2xl font-bold mb-6">История транзакций</h2>
           
           {wallet.transactions.length === 0 ? (
-            <p className="text-grey-5 text-base">No transactions yet.</p>
+            <p className="text-grey-5 text-base">Транзакций пока нет.</p>
           ) : (
             <div className="space-y-4">
               {wallet.transactions.slice().reverse().map((transaction) => (
@@ -219,41 +233,37 @@ const Wallet = () => {
         </div>
       </section>
 
-      {/* Buy Modal */}
       {showBuyModal && selectedCrypto && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-secondary rounded-2xl p-8 w-full max-w-md">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-white text-2xl font-bold">Buy {selectedCrypto.name}</h2>
+              <h2 className="text-white text-2xl font-bold">Купить {selectedCrypto.name}</h2>
               <button onClick={() => setShowBuyModal(false)} className="text-white hover:text-grey-5">
                 <X className="w-6 h-6" />
               </button>
             </div>
             <div className="space-y-4">
-              <div>
-                <label className="block text-grey-5 text-sm mb-2">Amount</label>
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="Enter amount"
-                  className="w-full h-[55px] bg-white/10 border border-white/20 rounded-32 px-6 text-white placeholder:text-grey-5"
-                  min="0"
-                  step="0.0001"
-                />
-              </div>
+              <Input
+                type="number"
+                label="Количество"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="Введите количество"
+                min="0"
+                step="0.0001"
+              />
               <div className="bg-white/5 rounded-xl p-4">
-                <p className="text-grey-5 text-sm">Price per unit</p>
+                <p className="text-grey-5 text-sm">Цена за единицу</p>
                 <p className="text-white font-bold">{formatPrice(selectedCrypto.current_price)}</p>
               </div>
               <div className="bg-white/5 rounded-xl p-4">
-                <p className="text-grey-5 text-sm">Total cost</p>
+                <p className="text-grey-5 text-sm">Общая стоимость</p>
                 <p className="text-white font-bold">
                   {amount ? formatPrice(parseFloat(amount) * selectedCrypto.current_price) : '$0.00'}
                 </p>
               </div>
               <div className="bg-white/5 rounded-xl p-4">
-                <p className="text-grey-5 text-sm">Your balance</p>
+                <p className="text-grey-5 text-sm">Ваш баланс</p>
                 <p className="text-white font-bold">{formatPrice(wallet.balance)}</p>
               </div>
               <Button 
@@ -261,48 +271,44 @@ const Wallet = () => {
                 className="w-full"
                 disabled={!amount || parseFloat(amount) * selectedCrypto.current_price > wallet.balance}
               >
-                Buy {selectedCrypto.symbol.toUpperCase()}
+                Купить {selectedCrypto.symbol.toUpperCase()}
               </Button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Sell Modal */}
       {showSellModal && selectedCrypto && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-secondary rounded-2xl p-8 w-full max-w-md">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-white text-2xl font-bold">Sell {selectedCrypto.name}</h2>
+              <h2 className="text-white text-2xl font-bold">Продать {selectedCrypto.name}</h2>
               <button onClick={() => setShowSellModal(false)} className="text-white hover:text-grey-5">
                 <X className="w-6 h-6" />
               </button>
             </div>
             <div className="space-y-4">
-              <div>
-                <label className="block text-grey-5 text-sm mb-2">Amount</label>
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="Enter amount"
-                  className="w-full h-[55px] bg-white/10 border border-white/20 rounded-32 px-6 text-white placeholder:text-grey-5"
-                  min="0"
-                  step="0.0001"
-                />
-              </div>
+              <Input
+                type="number"
+                label="Количество"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="Введите количество"
+                min="0"
+                step="0.0001"
+              />
               <div className="bg-white/5 rounded-xl p-4">
-                <p className="text-grey-5 text-sm">Price per unit</p>
+                <p className="text-grey-5 text-sm">Цена за единицу</p>
                 <p className="text-white font-bold">{formatPrice(selectedCrypto.current_price)}</p>
               </div>
               <div className="bg-white/5 rounded-xl p-4">
-                <p className="text-grey-5 text-sm">You will receive</p>
+                <p className="text-grey-5 text-sm">Вы получите</p>
                 <p className="text-white font-bold">
                   {amount ? formatPrice(parseFloat(amount) * selectedCrypto.current_price) : '$0.00'}
                 </p>
               </div>
               <div className="bg-white/5 rounded-xl p-4">
-                <p className="text-grey-5 text-sm">Your {selectedCrypto.symbol.toUpperCase()} balance</p>
+                <p className="text-grey-5 text-sm">Ваш баланс {selectedCrypto.symbol.toUpperCase()}</p>
                 <p className="text-white font-bold">
                   {wallet.assets.find(a => a.id === selectedCrypto.id)?.amount || 0} {selectedCrypto.symbol.toUpperCase()}
                 </p>
@@ -312,7 +318,7 @@ const Wallet = () => {
                 className="w-full"
                 disabled={!amount || parseFloat(amount) > (wallet.assets.find(a => a.id === selectedCrypto.id)?.amount || 0)}
               >
-                Sell {selectedCrypto.symbol.toUpperCase()}
+                Продать {selectedCrypto.symbol.toUpperCase()}
               </Button>
             </div>
           </div>
@@ -324,30 +330,27 @@ const Wallet = () => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-secondary rounded-2xl p-8 w-full max-w-md">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-white text-2xl font-bold">Deposit Funds</h2>
+              <h2 className="text-white text-2xl font-bold">Пополнить счёт</h2>
               <button onClick={() => setShowDepositModal(false)} className="text-white hover:text-grey-5">
                 <X className="w-6 h-6" />
               </button>
             </div>
             <div className="space-y-4">
-              <div>
-                <label className="block text-grey-5 text-sm mb-2">Amount (USD)</label>
-                <input
-                  type="number"
-                  value={depositAmount}
-                  onChange={(e) => setDepositAmount(e.target.value)}
-                  placeholder="Enter amount"
-                  className="w-full h-[55px] bg-white/10 border border-white/20 rounded-32 px-6 text-white placeholder:text-grey-5"
-                  min="0"
-                  step="0.01"
-                />
-              </div>
+              <Input
+                type="number"
+                label="Сумма (USD)"
+                value={depositAmount}
+                onChange={(e) => setDepositAmount(e.target.value)}
+                placeholder="Введите сумму"
+                min="0"
+                step="0.01"
+              />
               <div className="bg-white/5 rounded-xl p-4">
-                <p className="text-grey-5 text-sm">Current balance</p>
+                <p className="text-grey-5 text-sm">Текущий баланс</p>
                 <p className="text-white font-bold">{formatPrice(wallet.balance)}</p>
               </div>
               <div className="bg-white/5 rounded-xl p-4">
-                <p className="text-grey-5 text-sm">New balance after deposit</p>
+                <p className="text-grey-5 text-sm">Новый баланс после пополнения</p>
                 <p className="text-white font-bold">
                   {depositAmount ? formatPrice(wallet.balance + parseFloat(depositAmount)) : formatPrice(wallet.balance)}
                 </p>
@@ -357,7 +360,7 @@ const Wallet = () => {
                 className="w-full"
                 disabled={!depositAmount || parseFloat(depositAmount) <= 0}
               >
-                Deposit
+                Пополнить
               </Button>
             </div>
           </div>

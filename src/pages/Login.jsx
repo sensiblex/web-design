@@ -3,22 +3,27 @@ import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
 import Button from '../components/common/Button';
+import Input from '../components/common/Input';
 import { useAuth } from '../context/AuthContext';
+import { validateLoginForm } from '../utils/validation';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setFieldErrors({});
 
-    if (!email || !password) {
-      setError('Please fill in all fields');
+    const validation = validateLoginForm(email, password);
+    if (!validation.isValid) {
+      setFieldErrors(validation.errors);
       return;
     }
 
@@ -26,9 +31,9 @@ const Login = () => {
 
     try {
       login(email, password);
-      navigate('/wallet');
+      navigate('/profile');
     } catch (err) {
-      setError(err.message || 'Login failed. Please try again.');
+      setError(err.message || 'Ошибка входа. Попробуйте ещё раз.');
     } finally {
       setLoading(false);
     }
@@ -41,7 +46,7 @@ const Login = () => {
       <section className="w-full px-[120px] py-[80px] flex justify-center">
         <div className="w-full max-w-md">
           <h1 className="text-[48px] font-bold leading-[72px] text-white mb-[60px] text-center">
-            Login
+            Вход
           </h1>
 
           <div className="bg-secondary rounded-2xl p-8">
@@ -52,39 +57,35 @@ const Login = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-grey-5 text-sm mb-2">Email</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="w-full h-[55px] bg-white/10 border border-white/20 rounded-32 px-6 text-white placeholder:text-grey-5"
-                  required
-                />
-              </div>
+              <Input
+                type="email"
+                label="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Введите ваш email"
+                required
+                error={fieldErrors.email}
+              />
 
-              <div>
-                <label className="block text-grey-5 text-sm mb-2">Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="w-full h-[55px] bg-white/10 border border-white/20 rounded-32 px-6 text-white placeholder:text-grey-5"
-                  required
-                />
-              </div>
+              <Input
+                type="password"
+                label="Пароль"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Введите ваш пароль"
+                required
+                error={fieldErrors.password}
+              />
 
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Logging in...' : 'Login'}
+                {loading ? 'Выполняется вход...' : 'Войти'}
               </Button>
             </form>
 
             <p className="text-center text-grey-5 text-base mt-6">
-              Don't have an account?{' '}
+              Нет аккаунта?{' '}
               <Link to="/register" className="text-accent hover:underline">
-                Register
+                Регистрация
               </Link>
             </p>
           </div>

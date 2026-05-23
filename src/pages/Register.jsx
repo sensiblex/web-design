@@ -3,7 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
 import Button from '../components/common/Button';
+import Input from '../components/common/Input';
 import { useAuth } from '../context/AuthContext';
+import { validateRegisterForm } from '../utils/validation';
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -11,41 +13,18 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
   const { register } = useAuth();
   const navigate = useNavigate();
-
-  const validateEmail = (email) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-  };
-
-  const validatePassword = (password) => {
-    // At least 8 characters, 1 uppercase, 1 lowercase, 1 number
-    const re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/;
-    return re.test(password);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setFieldErrors({});
 
-    if (!email || !password || !confirmPassword) {
-      setError('Please fill in all fields');
-      return;
-    }
-
-    if (!validateEmail(email)) {
-      setError('Please enter a valid email address');
-      return;
-    }
-
-    if (!validatePassword(password)) {
-      setError('Password must be at least 8 characters with uppercase, lowercase, and number');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
+    const validation = validateRegisterForm(email, password, confirmPassword);
+    if (!validation.isValid) {
+      setFieldErrors(validation.errors);
       return;
     }
 
@@ -53,9 +32,9 @@ const Register = () => {
 
     try {
       register(email, password);
-      navigate('/wallet');
+      navigate('/profile');
     } catch (err) {
-      setError(err.message || 'Registration failed. Please try again.');
+      setError(err.message || 'Ошибка регистрации. Попробуйте ещё раз.');
     } finally {
       setLoading(false);
     }
@@ -68,7 +47,7 @@ const Register = () => {
       <section className="w-full px-[120px] py-[80px] flex justify-center">
         <div className="w-full max-w-md">
           <h1 className="text-[48px] font-bold leading-[72px] text-white mb-[60px] text-center">
-            Register
+            Регистрация
           </h1>
 
           <div className="bg-secondary rounded-2xl p-8">
@@ -79,51 +58,45 @@ const Register = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-grey-5 text-sm mb-2">Email</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="w-full h-[55px] bg-white/10 border border-white/20 rounded-32 px-6 text-white placeholder:text-grey-5"
-                  required
-                />
-              </div>
+              <Input
+                type="email"
+                label="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Введите ваш email"
+                required
+                error={fieldErrors.email}
+              />
 
-              <div>
-                <label className="block text-grey-5 text-sm mb-2">Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Min 8 chars, uppercase, lowercase, number"
-                  className="w-full h-[55px] bg-white/10 border border-white/20 rounded-32 px-6 text-white placeholder:text-grey-5"
-                  required
-                />
-              </div>
+              <Input
+                type="password"
+                label="Пароль"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Минимум 8 символов, заглавная, строчная, цифра"
+                required
+                error={fieldErrors.password}
+              />
 
-              <div>
-                <label className="block text-grey-5 text-sm mb-2">Confirm Password</label>
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Confirm your password"
-                  className="w-full h-[55px] bg-white/10 border border-white/20 rounded-32 px-6 text-white placeholder:text-grey-5"
-                  required
-                />
-              </div>
+              <Input
+                type="password"
+                label="Подтвердите пароль"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Подтвердите ваш пароль"
+                required
+                error={fieldErrors.confirmPassword}
+              />
 
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Registering...' : 'Register'}
+                {loading ? 'Регистрация...' : 'Зарегистрироваться'}
               </Button>
             </form>
 
             <p className="text-center text-grey-5 text-base mt-6">
-              Already have an account?{' '}
+              Уже есть аккаунт?{' '}
               <Link to="/login" className="text-accent hover:underline">
-                Login
+                Войти
               </Link>
             </p>
           </div>
